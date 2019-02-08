@@ -1,5 +1,8 @@
 #include "PhysicsScene.h"
 #include "Rigidbody.h"
+#include "Application2D.h"
+#include "Collision.h"
+#include "Hash.h"
 #include <list>
 #include <iostream>
 
@@ -50,7 +53,7 @@ void PhysicsScene::DebugScene()
 void PhysicsScene::Update(float fDeltaTime)
 {
 	// list of already collided PhysicsObjects
-	static std::list<PhysicsObject*> dirty;
+	static std::list<Collision*> collisions;
 
 	// update physics at a fixed time step
 	static float fAccumulatedTime = 0.f;
@@ -68,32 +71,86 @@ void PhysicsScene::Update(float fDeltaTime)
 		// check for collisions
 		for (auto pActor : m_pActors)
 		{
+			Rigidbody* pRigid = (Rigidbody*)pActor;
+
+			// check collision against other actors
 			for (auto pOther : m_pActors)
 			{
 				// ignore if both actors are the same actor
 				if (pActor == pOther)
 					continue;
 
-				// ignore if both are already in list
-				if (std::find(dirty.begin(), dirty.end(), pActor) != dirty.end() &&
-					std::find(dirty.begin(), dirty.end(), pOther) != dirty.end())
-					continue;
+				// create new collision
+				Collision* collision = new Collision(pActor, pOther);
 
-				Rigidbody* pRigid = dynamic_cast<Rigidbody*>(pActor);
+				// ignore if collision has already occurred
+				for (auto pCollision : collisions)
+				{
+					char collisionAddress[sizeof(Collision)];
+					sprintf(collisionAddress, "%i", collision);
+
+					char collisionAddress1[sizeof(Collision)];
+					sprintf(collisionAddress1, "%i", pCollision);
+
+					// compare collision hashes
+					Hash h;
+					if (h.DoHash(collisionAddress, strlen(collisionAddress)) == h.DoHash(collisionAddress1, strlen(collisionAddress1)))
+					{
+						//std::cout << h.DoHash(collisionAddress, strlen(collisionAddress)) << " = " << h.DoHash(collisionAddress1, strlen(collisionAddress1)) << std::endl;
+						continue;
+					}
+				}
+
 				if (pRigid->CheckCollision(pOther))
 				{
-					pRigid->ApplyForceToActor(dynamic_cast<Rigidbody*>(pOther), pRigid->GetVelocity() * pRigid->GetMass());
-					dirty.push_back(pRigid);
-					dirty.push_back(pOther);
+					pRigid->ApplyForceToActor((Rigidbody*)pOther, pRigid->GetVelocity());
+					collisions.push_back(collision);
+				}
+				else 
+				{
+					delete collision;
+					collision = nullptr;
 				}
 			}
+
+			float fAspectRatio = (float)Application2D::GetInstance()->getWindowHeight() / (float)Application2D::GetInstance()->getWindowWidth();
+
+			// check collision against boundaries
+			if (pRigid->GetPosition().x > 100.f)
+			{
+				pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
+				pRigid->SetPosition(glm::vec2(99.9f, pRigid->GetPosition().y));
+			}
+			else if (pRigid->GetPosition().x < -100.f)
+			{
+				pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
+				pRigid->SetPosition(glm::vec2(-99.9f, pRigid->GetPosition().y));
+			}
+
+			if (pRigid->GetPosition().y > 100.f * fAspectRatio)
+			{
+				pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
+				pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, 99.9f * fAspectRatio));
+			}
+			else if (pRigid->GetPosition().y < -100.f * fAspectRatio)
+			{
+				pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
+				pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, -99.9f * fAspectRatio));
+			}
 		}
-		dirty.clear();
+		// clear collision list
+		for (auto collision : collisions)
+		{
+			delete collision;
+			collision = nullptr;
+		}
+		collisions.clear();
 	}
 }
 
 void PhysicsScene::UpdateGizmos()
 {
+	// add gizmos for each actor
 	for (auto pActor : m_pActors)
 	{
 		pActor->MakeGizmo();

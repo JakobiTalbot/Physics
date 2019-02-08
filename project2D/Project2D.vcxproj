@@ -164,6 +164,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application2D.cpp" />
+    <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="Hash.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="PhysicsScene.cpp" />
@@ -172,6 +174,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application2D.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="Hash.h" />
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="PhysicsScene.h" />
     <ClInclude Include="Rigidbody.h" />

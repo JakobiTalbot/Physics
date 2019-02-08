@@ -34,6 +34,14 @@ void Rigidbody::ApplyForce(glm::vec2 v2Force)
 
 void Rigidbody::ApplyForceToActor(Rigidbody* pActor, glm::vec2 v2Force)
 {
-	pActor->ApplyForce(v2Force * .5f);
-	ApplyForce(-v2Force * .5f);
+	// get direction between rigidbodies
+	glm::vec2 v2Dir = pActor->GetPosition() - this->GetPosition();
+	v2Dir = glm::normalize(v2Dir);
+
+	float fMagnitude = v2Force.length();
+	float fTotalMass = pActor->GetMass() + this->GetMass();
+
+	// apply forces to rigidbodies
+	pActor->ApplyForce((v2Dir * fMagnitude * (pActor->GetMass()/ fTotalMass)));
+	ApplyForce((-v2Dir * fMagnitude * (this->GetMass() / fTotalMass)));
 }

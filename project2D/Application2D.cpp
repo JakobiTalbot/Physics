@@ -4,10 +4,12 @@
 #include "Input.h"
 #include <Gizmos.h>
 #include <glm\ext.hpp>
-#include "Sphere.h"
+#include <math.h>
+
+Application2D* Application2D::m_app = nullptr;
 
 Application2D::Application2D() {
-
+	m_app = this;
 }
 
 Application2D::~Application2D() {
@@ -21,12 +23,14 @@ bool Application2D::startup() {
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
 
 	m_pPhysicsScene = new PhysicsScene();
-	m_pPhysicsScene->SetGravity(glm::vec2(0, -10));
-	m_pPhysicsScene->SetTimeStep(0.01f);
+	m_pPhysicsScene->SetGravity(glm::vec2(0, -9.81f));
 
-	Sphere* ball;
-	ball = new Sphere(glm::vec2(-40, 0), glm::vec2(10, 30), 3.f, 1, glm::vec4(1, 0, 0, 1));
-	m_pPhysicsScene->AddActor(ball);
+	for (int i = 0; i < 20; ++i)
+	{
+		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, rand() % 20), glm::vec2(20, 0), 1.f, 3.f, glm::vec4(rand() % 2, rand() % 2, 1, 1));
+		m_pPhysicsScene->AddActor(ball);
+		m_pSpheres.push_back(ball);
+	}
 
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	
@@ -45,6 +49,8 @@ void Application2D::shutdown() {
 	m_2dRenderer = nullptr;
 	delete m_pPhysicsScene;
 	m_pPhysicsScene = nullptr;
+
+	aie::Gizmos::destroy();
 }
 
 void Application2D::update(float deltaTime) {
@@ -75,7 +81,7 @@ void Application2D::draw() {
 	// begin drawing sprites
 	m_2dRenderer->begin();
 
-	static float fAspectRatio = 16 / 9.f;
+	float fAspectRatio = (float)getWindowWidth() / (float)getWindowHeight();
 	aie::Gizmos::draw2D(glm::ortho<float>(-100, 100, -100 / fAspectRatio, 100 / fAspectRatio, -1.f, 1.f));
 
 	// done drawing sprites
