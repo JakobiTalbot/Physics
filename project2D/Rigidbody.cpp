@@ -36,12 +36,13 @@ void Rigidbody::ApplyForceToActor(Rigidbody* pActor, glm::vec2 v2Force)
 {
 	// get direction between rigidbodies
 	glm::vec2 v2Dir = pActor->GetPosition() - this->GetPosition();
-	v2Dir = glm::normalize(v2Dir);
+	// calculate impulse
+	float fImpulse = -(1.f + 1.f) * glm::dot(v2Dir, glm::normalize(v2Dir));
+	fImpulse /= glm::dot(glm::normalize(v2Dir), glm::normalize(v2Dir) * (m_fMass + pActor->GetMass()));
 
-	float fMagnitude = v2Force.length();
 	float fTotalMass = pActor->GetMass() + this->GetMass();
 
 	// apply forces to rigidbodies
-	pActor->ApplyForce((v2Dir * fMagnitude * (pActor->GetMass()/ fTotalMass)));
-	ApplyForce((-v2Dir * fMagnitude * (this->GetMass() / fTotalMass)));
+	pActor->ApplyForce((-glm::normalize(v2Dir) * fImpulse * (pActor->GetMass()/ fTotalMass)));
+	ApplyForce((glm::normalize(v2Dir) * fImpulse * (this->GetMass() / fTotalMass)));
 }

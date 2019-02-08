@@ -20,6 +20,8 @@ public:
 	virtual void MakeGizmo() = 0;
 	virtual void ResetPosition() {}
 
+	ShapeType GetShapeID() { return m_shapeID; }
+
 protected:
 	ShapeType m_shapeID;
 };

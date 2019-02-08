@@ -25,4 +25,5 @@ protected:
 	glm::vec2 m_v2Gravity;
 	float m_fTimeStep;
 	std::vector<PhysicsObject*> m_pActors;
+	PhysicsObject* m_pSelectedObject;
 };

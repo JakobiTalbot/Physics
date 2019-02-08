@@ -1,4 +1,5 @@
 #include "Sphere.h"
+#include "AABB.h"
 
 Sphere::Sphere(glm::vec2 v2Position, glm::vec2 v2Velocity, float fMass, float fRadius, glm::vec4 v4Colour)
 	: Rigidbody(SPHERE, v2Position, v2Velocity, 0, fMass)
@@ -18,15 +19,20 @@ void Sphere::MakeGizmo()
 
 bool Sphere::CheckCollision(PhysicsObject* pOther)
 {
-	// check if other PhysicsObject is a sphere
-	Sphere* pOtherSphere = dynamic_cast<Sphere*>(pOther);
-	if (!pOtherSphere)
-		return false;
-
-	// check collision
-	if (glm::distance(m_v2Position, pOtherSphere->GetPosition()) < (m_fRadius + pOtherSphere->GetRadius()))
+	Sphere* pOtherSphere;
+	switch (pOther->GetShapeID())
 	{
-		return true;
+	case SPHERE:
+		// check collision
+		pOtherSphere = (Sphere*)pOther;
+		if (glm::distance(m_v2Position, pOtherSphere->GetPosition()) < (m_fRadius + pOtherSphere->GetRadius()))
+		{
+			return true;
+		}
+		break;
+	case BOX:
+		AABB* pOtherBox = (AABB*)pOther;
+		break;
 	}
 
 	return false;

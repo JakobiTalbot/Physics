@@ -3,6 +3,7 @@
 #include "Application2D.h"
 #include "Collision.h"
 #include "Hash.h"
+#include "Input.h"
 #include <list>
 #include <iostream>
 
@@ -11,6 +12,7 @@ PhysicsScene::PhysicsScene()
 	// initialise variables
 	m_fTimeStep = 0.01f;
 	m_v2Gravity = glm::vec2(0, 0);
+	m_pSelectedObject = nullptr;
 }
 
 PhysicsScene::~PhysicsScene()
@@ -59,6 +61,34 @@ void PhysicsScene::Update(float fDeltaTime)
 	static float fAccumulatedTime = 0.f;
 	fAccumulatedTime += fDeltaTime;
 
+	// DRAG OBJECT
+	if (!m_pSelectedObject)
+	{
+		if (aie::Input::getInstance()->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
+		{
+			for (auto pActors : m_pActors)
+			{
+				glm::vec2 v2MousePos = glm::vec2(aie::Input::getInstance()->getMouseX(), aie::Input::getInstance()->getMouseX());
+				Sphere* s = (Sphere*)pActors;
+				if (glm::distance(v2MousePos, s->GetPosition()) <= s->GetRadius())
+				{
+					m_pSelectedObject == pActors;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (aie::Input::getInstance()->wasMouseButtonReleased(aie::INPUT_MOUSE_BUTTON_LEFT))
+			m_pSelectedObject = nullptr;
+
+		Rigidbody* rb = (Rigidbody*)m_pSelectedObject;
+		glm::vec2 v2MousePos = glm::vec2(aie::Input::getInstance()->getMouseX(), aie::Input::getInstance()->getMouseX());
+		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 10.f);
+	}
+
+	// fixed update
 	while (fAccumulatedTime >= m_fTimeStep)
 	{
 		for (auto pActor : m_pActors)
@@ -96,7 +126,6 @@ void PhysicsScene::Update(float fDeltaTime)
 					Hash h;
 					if (h.DoHash(collisionAddress, strlen(collisionAddress)) == h.DoHash(collisionAddress1, strlen(collisionAddress1)))
 					{
-						//std::cout << h.DoHash(collisionAddress, strlen(collisionAddress)) << " = " << h.DoHash(collisionAddress1, strlen(collisionAddress1)) << std::endl;
 						continue;
 					}
 				}
