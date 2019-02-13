@@ -11,11 +11,10 @@ public:
 	void ApplyForce(glm::vec2 v2Force);
 	void ApplyForceToActor(Rigidbody* pActor, glm::vec2 v2Force);
 
-	virtual bool CheckCollision(PhysicsObject* pOther) = 0;
-
 	glm::vec2 GetPosition() { return m_v2Position; }
 	void SetPosition(glm::vec2 v2Position) { m_v2Position = v2Position; }
 	glm::vec2 GetVelocity() { return m_v2Velocity; }
+	void SetVelocity(glm::vec2 v2Velocity) { m_v2Velocity = v2Velocity; }
 	float GetMass() { return m_fMass; }
 	float GetRotation() { return m_fRotation; }
 

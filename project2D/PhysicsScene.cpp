@@ -6,6 +6,15 @@
 #include "Input.h"
 #include <list>
 #include <iostream>
+#include "Plane.h"
+
+typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
+static fn CollisionFunctionArray[] =
+{
+	PhysicsScene::Plane2Plane,		PhysicsScene::Plane2Sphere,		PhysicsScene::Plane2AABB,
+	PhysicsScene::Sphere2Plane,		PhysicsScene::Sphere2Sphere,	PhysicsScene::Sphere2AABB,
+	PhysicsScene::AABB2Plane,		PhysicsScene::AABB2Sphere,		PhysicsScene::AABB2AABB
+};
 
 PhysicsScene::PhysicsScene()
 {
@@ -61,6 +70,13 @@ void PhysicsScene::Update(float fDeltaTime)
 	static float fAccumulatedTime = 0.f;
 	fAccumulatedTime += fDeltaTime;
 
+	float fAspectRatio = (float)Application2D::GetInstance()->getWindowHeight() / (float)Application2D::GetInstance()->getWindowWidth();
+	glm::vec2 v2MousePos = glm::vec2(aie::Input::getInstance()->getMouseX() / (float)Application2D::GetInstance()->getWindowWidth(), aie::Input::getInstance()->getMouseY() / (float)Application2D::GetInstance()->getWindowHeight());
+	v2MousePos.x *= 200.0f;
+	v2MousePos.x -= 100.0f;
+	v2MousePos.y *= 112.5f;
+	v2MousePos.y -= 56.25f;
+
 	// DRAG OBJECT
 	if (!m_pSelectedObject)
 	{
@@ -68,11 +84,10 @@ void PhysicsScene::Update(float fDeltaTime)
 		{
 			for (auto pActors : m_pActors)
 			{
-				glm::vec2 v2MousePos = glm::vec2(aie::Input::getInstance()->getMouseX(), aie::Input::getInstance()->getMouseX());
 				Sphere* s = (Sphere*)pActors;
 				if (glm::distance(v2MousePos, s->GetPosition()) <= s->GetRadius())
 				{
-					m_pSelectedObject == pActors;
+					m_pSelectedObject = pActors;
 					break;
 				}
 			}
@@ -80,12 +95,11 @@ void PhysicsScene::Update(float fDeltaTime)
 	}
 	else
 	{
+		Rigidbody* rb = (Rigidbody*)m_pSelectedObject;
+		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 0.1f);
+
 		if (aie::Input::getInstance()->wasMouseButtonReleased(aie::INPUT_MOUSE_BUTTON_LEFT))
 			m_pSelectedObject = nullptr;
-
-		Rigidbody* rb = (Rigidbody*)m_pSelectedObject;
-		glm::vec2 v2MousePos = glm::vec2(aie::Input::getInstance()->getMouseX(), aie::Input::getInstance()->getMouseX());
-		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 10.f);
 	}
 
 	// fixed update
@@ -103,69 +117,32 @@ void PhysicsScene::Update(float fDeltaTime)
 		{
 			Rigidbody* pRigid = (Rigidbody*)pActor;
 
-			// check collision against other actors
-			for (auto pOther : m_pActors)
-			{
-				// ignore if both actors are the same actor
-				if (pActor == pOther)
-					continue;
-
-				// create new collision
-				Collision* collision = new Collision(pActor, pOther);
-
-				// ignore if collision has already occurred
-				for (auto pCollision : collisions)
-				{
-					char collisionAddress[sizeof(Collision)];
-					sprintf(collisionAddress, "%i", collision);
-
-					char collisionAddress1[sizeof(Collision)];
-					sprintf(collisionAddress1, "%i", pCollision);
-
-					// compare collision hashes
-					Hash h;
-					if (h.DoHash(collisionAddress, strlen(collisionAddress)) == h.DoHash(collisionAddress1, strlen(collisionAddress1)))
-					{
-						continue;
-					}
-				}
-
-				if (pRigid->CheckCollision(pOther))
-				{
-					pRigid->ApplyForceToActor((Rigidbody*)pOther, pRigid->GetVelocity());
-					collisions.push_back(collision);
-				}
-				else 
-				{
-					delete collision;
-					collision = nullptr;
-				}
-			}
+			CheckForCollision();
 
 			float fAspectRatio = (float)Application2D::GetInstance()->getWindowHeight() / (float)Application2D::GetInstance()->getWindowWidth();
 
 			// check collision against boundaries
-			if (pRigid->GetPosition().x > 100.f)
-			{
-				pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
-				pRigid->SetPosition(glm::vec2(99.9f, pRigid->GetPosition().y));
-			}
-			else if (pRigid->GetPosition().x < -100.f)
-			{
-				pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
-				pRigid->SetPosition(glm::vec2(-99.9f, pRigid->GetPosition().y));
-			}
+			//if (pRigid->GetPosition().x > 100.f)
+			//{
+			//	pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
+			//	pRigid->SetPosition(glm::vec2(99.9f, pRigid->GetPosition().y));
+			//}
+			//else if (pRigid->GetPosition().x < -100.f)
+			//{
+			//	pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
+			//	pRigid->SetPosition(glm::vec2(-99.9f, pRigid->GetPosition().y));
+			//}
 
-			if (pRigid->GetPosition().y > 100.f * fAspectRatio)
-			{
-				pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
-				pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, 99.9f * fAspectRatio));
-			}
-			else if (pRigid->GetPosition().y < -100.f * fAspectRatio)
-			{
-				pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
-				pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, -99.9f * fAspectRatio));
-			}
+			//if (pRigid->GetPosition().y > 100.f * fAspectRatio)
+			//{
+			//	pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
+			//	pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, 99.9f * fAspectRatio));
+			//}
+			//else if (pRigid->GetPosition().y < -100.f * fAspectRatio)
+			//{
+			//	pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
+			//	pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, -99.9f * fAspectRatio));
+			//}
 		}
 		// clear collision list
 		for (auto collision : collisions)
@@ -184,4 +161,103 @@ void PhysicsScene::UpdateGizmos()
 	{
 		pActor->MakeGizmo();
 	}
+}
+
+void PhysicsScene::CheckForCollision()
+{
+	for (int i = 0; i < m_pActors.size() - 1; ++i)
+	{
+		for (int j = i + 1; j < m_pActors.size(); ++j)
+		{
+			PhysicsObject* pObject1 = m_pActors[i];
+			PhysicsObject* pObject2 = m_pActors[j];
+			int nShapeID1 = pObject1->GetShapeID();
+			int nShapeID2 = pObject2->GetShapeID();
+
+			// function pointers
+			int functionIdx = (nShapeID1 * SHAPETYPECOUNT) + nShapeID2;
+			fn collisionFunctionPtr = CollisionFunctionArray[functionIdx];
+
+			if (collisionFunctionPtr)
+			{
+				// check for collision
+				collisionFunctionPtr(pObject1, pObject2);
+			}
+		}
+	}
+}
+
+bool PhysicsScene::Plane2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	Plane* pPlane1 = (Plane*)pObject1;
+	Plane* pPlane2 = (Plane*)pObject2;
+	return false;
+}
+
+bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	Plane* pPlane = (Plane*)pObject1;
+	Sphere* pSphere = (Sphere*)pObject2;
+
+	glm::vec2 v2CollisionNormal = pPlane->GetNormal();
+	float fSphereToPlane = glm::dot(pSphere->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
+
+	// flip normal if sphere is behind plane
+	if (fSphereToPlane < 0)
+	{
+		v2CollisionNormal *= -1.f;
+		fSphereToPlane *= -1.f;
+	}
+
+	float fIntersection = pSphere->GetRadius() - fSphereToPlane;
+	if (fIntersection > 0)
+	{
+		// objects collide
+		pSphere->ApplyForce(-(1 + 1) * glm::dot(pSphere->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
+		return true;
+	}
+	return false;
+}
+
+bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return false;
+}
+
+bool PhysicsScene::Sphere2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return Plane2Sphere(pObject2, pObject1);
+}
+
+bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	Sphere* pSphere1 = (Sphere*)pObject1;
+	Sphere* pSphere2 = (Sphere*)pObject2;
+	// check if distance is lower than sum of radii
+	if (glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) < (pSphere1->GetRadius() + pSphere2->GetRadius()))
+	{
+		pSphere1->ApplyForceToActor(pSphere2, pSphere1->GetVelocity());
+		return true;
+	}
+	return false;
+}
+
+bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return false;
+}
+
+bool PhysicsScene::AABB2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return false;
+}
+
+bool PhysicsScene::AABB2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return false;
+}
+
+bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
+{
+	return false;
 }

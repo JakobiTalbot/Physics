@@ -7,7 +7,6 @@ public:
 	~AABB();
 
 	virtual void MakeGizmo();
-	virtual bool CheckCollision(PhysicsObject* pOther);
 
 	glm::vec2 GetMaximum() { return m_v2Maximum; }
 	glm::vec2 GetMinimum() { return m_v2Minimum; }

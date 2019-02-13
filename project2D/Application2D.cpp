@@ -5,7 +5,9 @@
 #include <Gizmos.h>
 #include <glm\ext.hpp>
 #include <math.h>
-
+#include "AABB.h"
+#include "Sphere.h"
+#include "Plane.h"
 Application2D* Application2D::m_app = nullptr;
 
 Application2D::Application2D() {
@@ -24,13 +26,22 @@ bool Application2D::startup() {
 
 	m_pPhysicsScene = new PhysicsScene();
 	m_pPhysicsScene->SetGravity(glm::vec2(0, -9.81f));
+	m_pPhysicsScene->SetTimeStep(1.f/60.f);
 
 	for (int i = 0; i < 20; ++i)
 	{
-		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, rand() % 20), glm::vec2(20, 0), 1.f, 3.f, glm::vec4(rand() % 2, rand() % 2, 1, 1));
+		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, (rand() % 100) - 50), glm::vec2((rand() % 60) - 30, (rand() % 60) - 30), 1.f, 3.f, glm::vec4(rand() % 2, rand() % 2, 1, 1));
 		m_pPhysicsScene->AddActor(ball);
-		m_pSpheres.push_back(ball);
 	}
+
+	Plane* topPlane = new Plane(glm::vec2(0.f, -1.f), -55.f);
+	m_pPhysicsScene->AddActor(topPlane);
+	Plane* leftPlane = new Plane(glm::vec2(1.f, 0.f), -99.f);
+	m_pPhysicsScene->AddActor(leftPlane);
+	Plane* bottomPlane = new Plane(glm::vec2(0.f, 1.f), -55.f);
+	m_pPhysicsScene->AddActor(bottomPlane);
+	Plane* rightPlane = new Plane(glm::vec2(-1.f, 0.f), -99.f);
+	m_pPhysicsScene->AddActor(rightPlane);
 
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	

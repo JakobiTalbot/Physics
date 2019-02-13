@@ -16,28 +16,3 @@ void AABB::MakeGizmo()
 {
 	aie::Gizmos::add2DAABBFilled(m_v2Position, m_v2Maximum, m_v4Colour);
 }
-
-bool AABB::CheckCollision(PhysicsObject* pOther)
-{
-	switch (pOther->GetShapeID())
-	{
-	case SPHERE:
-		// check collision
-		//Sphere* pOtherSphere = (Sphere*)pOther;
-		//if (glm::distance(m_v2Position, pOtherSphere->GetPosition()) < (m_fRadius + pOtherSphere->GetRadius()))
-		//{
-		//	return true;
-		//}
-		break;
-	case BOX:
-		AABB* pOtherBox = (AABB*)pOther;
-		if (m_v2Minimum.x < pOtherBox->GetMaximum().x
-			&& m_v2Maximum.x > pOtherBox->GetMinimum().y
-			&& m_v2Minimum.y < pOtherBox->GetMaximum().y
-			&& m_v2Maximum.y > pOtherBox->GetMinimum().y)
-			return true;
-		break;
-	}
-
-	return false;
-}

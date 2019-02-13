@@ -16,24 +16,3 @@ void Sphere::MakeGizmo()
 {
 	aie::Gizmos::add2DCircle(m_v2Position, m_fRadius, 32, m_v4Colour);
 }
-
-bool Sphere::CheckCollision(PhysicsObject* pOther)
-{
-	Sphere* pOtherSphere;
-	switch (pOther->GetShapeID())
-	{
-	case SPHERE:
-		// check collision
-		pOtherSphere = (Sphere*)pOther;
-		if (glm::distance(m_v2Position, pOtherSphere->GetPosition()) < (m_fRadius + pOtherSphere->GetRadius()))
-		{
-			return true;
-		}
-		break;
-	case BOX:
-		AABB* pOtherBox = (AABB*)pOther;
-		break;
-	}
-
-	return false;
-}

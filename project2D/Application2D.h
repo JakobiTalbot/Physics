@@ -25,8 +25,6 @@ protected:
 	aie::Renderer2D*	m_2dRenderer;
 	aie::Font*			m_font;
 
-	std::vector<Sphere*> m_pSpheres;
-
 	float m_cameraX, m_cameraY;
 	float m_timer;
 
