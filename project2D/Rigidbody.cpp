@@ -2,13 +2,14 @@
 
 
 
-Rigidbody::Rigidbody(ShapeType shapeID, glm::vec2 v2Position, glm::vec2 v2Velocity, float fRotation, float fMass)
+Rigidbody::Rigidbody(ShapeType shapeID, glm::vec2 v2Position, glm::vec2 v2Velocity, float fRotation, float fMass, float fElasticity)
 {
 	m_shapeID = shapeID;
 	m_v2Position = v2Position;
 	m_v2Velocity = v2Velocity;
 	m_fRotation = fRotation;
 	m_fMass = fMass;
+	m_fElasticity = fElasticity;
 }
 
 
@@ -37,7 +38,7 @@ void Rigidbody::ApplyForceToActor(Rigidbody* pActor, glm::vec2 v2Force)
 	// get direction between rigidbodies
 	glm::vec2 v2Dir = pActor->GetPosition() - this->GetPosition();
 	// calculate impulse
-	float fImpulse = -(1.f + 1.f) * glm::dot(v2Dir, glm::normalize(v2Dir));
+	float fImpulse = -(1.f + GetElasticity()) * glm::dot(v2Dir, glm::normalize(v2Dir));
 	fImpulse /= glm::dot(glm::normalize(v2Dir), glm::normalize(v2Dir) * (m_fMass + pActor->GetMass()));
 
 	float fTotalMass = pActor->GetMass() + this->GetMass();

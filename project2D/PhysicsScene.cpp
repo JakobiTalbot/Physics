@@ -7,6 +7,7 @@
 #include <list>
 #include <iostream>
 #include "Plane.h"
+#include "AABB.h"
 
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
 static fn CollisionFunctionArray[] =
@@ -105,45 +106,18 @@ void PhysicsScene::Update(float fDeltaTime)
 	// fixed update
 	while (fAccumulatedTime >= m_fTimeStep)
 	{
-		for (auto pActor : m_pActors)
-		{
-			pActor->FixedUpdate(m_v2Gravity, m_fTimeStep);
-		}
-
 		fAccumulatedTime -= m_fTimeStep;
 
 		// check for collisions
 		for (auto pActor : m_pActors)
 		{
+			pActor->FixedUpdate(m_v2Gravity, m_fTimeStep);
 			Rigidbody* pRigid = (Rigidbody*)pActor;
 
 			CheckForCollision();
-
 			float fAspectRatio = (float)Application2D::GetInstance()->getWindowHeight() / (float)Application2D::GetInstance()->getWindowWidth();
-
-			// check collision against boundaries
-			//if (pRigid->GetPosition().x > 100.f)
-			//{
-			//	pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
-			//	pRigid->SetPosition(glm::vec2(99.9f, pRigid->GetPosition().y));
-			//}
-			//else if (pRigid->GetPosition().x < -100.f)
-			//{
-			//	pRigid->ApplyForce(glm::vec2(-pRigid->GetVelocity().x * 2.f, 0.f));
-			//	pRigid->SetPosition(glm::vec2(-99.9f, pRigid->GetPosition().y));
-			//}
-
-			//if (pRigid->GetPosition().y > 100.f * fAspectRatio)
-			//{
-			//	pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
-			//	pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, 99.9f * fAspectRatio));
-			//}
-			//else if (pRigid->GetPosition().y < -100.f * fAspectRatio)
-			//{
-			//	pRigid->ApplyForce(glm::vec2(0.f, -pRigid->GetVelocity().y * 2.f));
-			//	pRigid->SetPosition(glm::vec2(pRigid->GetPosition().x, -99.9f * fAspectRatio));
-			//}
 		}
+
 		// clear collision list
 		for (auto collision : collisions)
 		{
@@ -213,7 +187,8 @@ bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2
 	if (fIntersection > 0)
 	{
 		// objects collide
-		pSphere->ApplyForce(-(1 + 1) * glm::dot(pSphere->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
+		pSphere->SetPosition(pSphere->GetPosition() + v2CollisionNormal * fIntersection);
+		pSphere->ApplyForce(-(1 + pSphere->GetElasticity()) * glm::dot(pSphere->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
 		return true;
 	}
 	return false;
@@ -226,6 +201,7 @@ bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 
 bool PhysicsScene::Sphere2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
+	// inverse the pointers and call Plane2Sphere
 	return Plane2Sphere(pObject2, pObject1);
 }
 
@@ -236,7 +212,23 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 	// check if distance is lower than sum of radii
 	if (glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) < (pSphere1->GetRadius() + pSphere2->GetRadius()))
 	{
-		pSphere1->ApplyForceToActor(pSphere2, pSphere1->GetVelocity());
+		// restitution
+		float fPenetration = glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) - (pSphere1->GetRadius() + pSphere2->GetRadius());
+
+		// get direction between rigidbodies
+		glm::vec2 v2Dir = pSphere1->GetPosition() - pSphere2->GetPosition();
+
+		// calculate impulse
+		float fImpulse = -(1.f + pSphere2->GetElasticity()) * glm::dot((pSphere2->GetVelocity() - pSphere1->GetVelocity()), glm::normalize(v2Dir));
+		fImpulse /= glm::dot(glm::normalize(v2Dir), glm::normalize(v2Dir) * (1 / pSphere2->GetMass() + 1 / pSphere1->GetMass()));
+
+		float fTotalMass = pSphere1->GetMass() + pSphere2->GetMass();
+		pSphere1->SetPosition(pSphere1->GetPosition() + -glm::normalize(v2Dir) * (fPenetration / 2.f));
+		pSphere2->SetPosition(pSphere2->GetPosition() + glm::normalize(v2Dir) * (fPenetration / 2.f));
+
+		// apply forces to rigidbodies
+		pSphere1->ApplyForce((-glm::normalize(v2Dir) * fImpulse * (pSphere1->GetMass() / fTotalMass)));
+		pSphere2->ApplyForce((glm::normalize(v2Dir) * fImpulse * (pSphere2->GetMass() / fTotalMass)));
 		return true;
 	}
 	return false;
@@ -249,15 +241,63 @@ bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 
 bool PhysicsScene::AABB2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
-	return false;
+	// inverse the pointers and call Plane2AABB
+	return Plane2AABB(pObject2, pObject1);
 }
 
 bool PhysicsScene::AABB2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
-	return false;
+	// inverse the pointers and call Sphere2AABB
+	return Sphere2AABB(pObject2, pObject1);
 }
 
 bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
-	return false;
+	AABB* pAABB1 = (AABB*)pObject1;
+	AABB* pAABB2 = (AABB*)pObject2;
+
+	// normals of each face
+	static const glm::vec2 v2Faces[4] = 
+	{
+		{-1, 0}, // left
+		{1, 0}, // right
+		{0, -1}, // bottom
+		{0, 1} // top
+	};
+
+	// distances between faces
+	float fDistances[4] =
+	{
+		(pAABB2->GetPosition().x + pAABB1->GetExtent().x - pAABB1->GetPosition().x - pAABB2->GetExtent().x), // left
+		(pAABB1->GetPosition().x + pAABB1->GetExtent().x - pAABB2->GetPosition().x - pAABB2->GetExtent().x), // right
+		(pAABB2->GetPosition().y + pAABB1->GetExtent().y - pAABB1->GetPosition().y - pAABB2->GetExtent().y), // bottom
+		(pAABB1->GetPosition().y + pAABB1->GetExtent().y - pAABB2->GetPosition().y - pAABB2->GetExtent().y) // top
+	};
+
+	float fCollisionDepth = 0.0f;
+	glm::vec2 v2CollisionNormal = { 0, 0 };
+	int iCollisionFace = NULL;
+	
+	// find collision normal
+	for (int i = 0; i < 4; ++i)
+	{
+		// box does not intersect face
+		if (fDistances[i] < 0.0f)
+			continue;
+		else if (fDistances[i] < fCollisionDepth) // lower intersection depth than previously scanned faces
+		{
+			fCollisionDepth = fDistances[i];
+			v2CollisionNormal = v2Faces[i];
+			iCollisionFace = i;
+		}
+	}
+
+	// end if not colliding
+	if (iCollisionFace == NULL)
+		return false;
+
+	// perform collision
+	pAABB1->SetPosition(pAABB1->GetPosition() + v2CollisionNormal * fCollisionDepth);
+	pAABB1->ApplyForce(-(1 + pAABB1->GetElasticity()) * glm::dot(pAABB1->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
+	return true;
 }
