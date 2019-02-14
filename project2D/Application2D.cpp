@@ -36,9 +36,9 @@ bool Application2D::startup() {
 		//m_pPhysicsScene->AddActor(ball);
 	}
 
-	AABB* box = new AABB({ -20, 0 }, { 10, 0 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	AABB* box = new AABB({ 0, -20 }, { 0, 10 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
 	m_pPhysicsScene->AddActor(box);
-	AABB* box1 = new AABB({ 20, 0 }, { -10, 0 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	AABB* box1 = new AABB({ 0, 20 }, { 0, -10 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
 	m_pPhysicsScene->AddActor(box1);
 
 	Plane* topPlane = new Plane(glm::vec2(0.f, -1.f), -55.f);

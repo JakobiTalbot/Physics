@@ -268,10 +268,10 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	// distances between faces
 	float fDistances[4] =
 	{
-		(pAABB2->GetPosition().x + pAABB1->GetExtent().x - pAABB1->GetPosition().x - pAABB2->GetExtent().x), // left
-		(pAABB1->GetPosition().x + pAABB1->GetExtent().x - pAABB2->GetPosition().x - pAABB2->GetExtent().x), // right
-		(pAABB2->GetPosition().y + pAABB1->GetExtent().y - pAABB1->GetPosition().y - pAABB2->GetExtent().y), // bottom
-		(pAABB1->GetPosition().y + pAABB1->GetExtent().y - pAABB2->GetPosition().y - pAABB2->GetExtent().y) // top
+		(pAABB2->GetPosition().x + pAABB1->GetExtent().x - (pAABB1->GetPosition().x - pAABB2->GetExtent().x)), // left
+		(pAABB1->GetPosition().x + pAABB1->GetExtent().x - (pAABB2->GetPosition().x - pAABB2->GetExtent().x)), // right
+		(pAABB2->GetPosition().y + pAABB1->GetExtent().y - (pAABB1->GetPosition().y - pAABB2->GetExtent().y)), // bottom
+		(pAABB1->GetPosition().y + pAABB1->GetExtent().y - (pAABB2->GetPosition().y - pAABB2->GetExtent().y)) // top
 	};
 
 	float fCollisionDepth = 0.0f;
@@ -283,8 +283,8 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	{
 		// box does not intersect face
 		if (fDistances[i] < 0.0f)
-			continue;
-		else if (fDistances[i] < fCollisionDepth) // lower intersection depth than previously scanned faces
+			return false;
+		else if (i == 0 || fDistances[i] < fCollisionDepth) // lower intersection depth than previously scanned faces
 		{
 			fCollisionDepth = fDistances[i];
 			v2CollisionNormal = v2Faces[i];
@@ -292,12 +292,22 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		}
 	}
 
-	// end if not colliding
-	if (iCollisionFace == NULL)
-		return false;
-
 	// perform collision
-	pAABB1->SetPosition(pAABB1->GetPosition() + v2CollisionNormal * fCollisionDepth);
-	pAABB1->ApplyForce(-(1 + pAABB1->GetElasticity()) * glm::dot(pAABB1->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
+			// calculate impulse
+	float fImpulse = -(1.f + pAABB2->GetElasticity()) * glm::dot((pAABB2->GetVelocity() - pAABB1->GetVelocity()), v2CollisionNormal);
+	fImpulse /= glm::dot(v2CollisionNormal, v2CollisionNormal * (1 / pAABB2->GetMass() + 1 / pAABB1->GetMass()));
+
+	float fTotalMass = pAABB1->GetMass() + pAABB2->GetMass();
+	pAABB1->SetPosition(pAABB1->GetPosition() + -v2CollisionNormal * (fCollisionDepth / 2.f));
+	pAABB2->SetPosition(pAABB2->GetPosition() + v2CollisionNormal * (fCollisionDepth / 2.f));
+
+	// apply forces to rigidbodies
+	pAABB1->ApplyForce((-v2CollisionNormal * fImpulse * (pAABB1->GetMass() / fTotalMass)));
+	pAABB2->ApplyForce((v2CollisionNormal * fImpulse * (pAABB2->GetMass() / fTotalMass)));
+
+
+	//pAABB1->SetPosition(pAABB1->GetPosition() - v2CollisionNormal * fCollisionDepth);
+	//pAABB1->ApplyForce(-(1 + pAABB1->GetElasticity()) * glm::dot(pAABB1->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
+	//pAABB2->ApplyForce(-(1 + pAABB2->GetElasticity()) * glm::dot(pAABB2->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
 	return true;
 }
