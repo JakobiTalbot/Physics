@@ -85,10 +85,29 @@ void PhysicsScene::Update(float fDeltaTime)
 		{
 			for (auto pActors : m_pActors)
 			{
-				Sphere* s = (Sphere*)pActors;
-				if (glm::distance(v2MousePos, s->GetPosition()) <= s->GetRadius())
+				// get shape type pointers
+				Sphere* pSphere = (Sphere*)pActors;
+				AABB* pAABB = (AABB*)pActors;
+
+				// find if mouse is on shape, depending on shape type
+				switch (pActors->GetShapeID())
 				{
-					m_pSelectedObject = pActors;
+				case ShapeType::SPHERE:
+					if (glm::distance(v2MousePos, pSphere->GetPosition()) <= pSphere->GetRadius())
+					{
+						m_pSelectedObject = pActors;
+						break;
+					}
+					break;
+				case ShapeType::BOX:
+					if (v2MousePos.x < pAABB->GetPosition().x + pAABB->GetExtent().x
+						&& v2MousePos.y < pAABB->GetPosition().y + pAABB->GetExtent().y
+						&& v2MousePos.x > pAABB->GetPosition().x - pAABB->GetExtent().x
+						&& v2MousePos.y > pAABB->GetPosition().y - pAABB->GetExtent().y)
+					{
+						m_pSelectedObject = pActors;
+						break;
+					}
 					break;
 				}
 			}
