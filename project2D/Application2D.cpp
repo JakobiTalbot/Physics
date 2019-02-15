@@ -26,7 +26,7 @@ bool Application2D::startup() {
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
 
 	m_pPhysicsScene = new PhysicsScene();
-	m_pPhysicsScene->SetGravity(glm::vec2(0, 0.f));
+	//m_pPhysicsScene->SetGravity(glm::vec2(0, -150));
 	m_pPhysicsScene->SetTimeStep(1.f/60.f);
 	srand(time(NULL));
 	for (int i = 0; i < 2; ++i)
@@ -36,11 +36,11 @@ bool Application2D::startup() {
 		//m_pPhysicsScene->AddActor(ball);
 	}
 
-	AABB* box = new AABB({ 0, -20 }, { 0, 10 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	AABB* box = new AABB({ 0, -20 }, { 0, 0 }, 0.f, 1.f, { 10.f, 10.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
 	m_pPhysicsScene->AddActor(box);
-	AABB* box1 = new AABB({ 0, 20 }, { 0, -10 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
-	m_pPhysicsScene->AddActor(box1);
-
+	//AABB* box1 = new AABB({ 0, 20 }, { 0, -10 }, 0.f, 1.f, { 3.f, 3.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	//m_pPhysicsScene->AddActor(box1);
+	//setBackgroundColour((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1.f);
 	Plane* topPlane = new Plane(glm::vec2(0.f, -1.f), -55.f);
 	m_pPhysicsScene->AddActor(topPlane);
 	Plane* leftPlane = new Plane(glm::vec2(1.f, 0.f), -99.f);
@@ -84,6 +84,8 @@ void Application2D::update(float deltaTime) {
 	// update physics scene
 	m_pPhysicsScene->Update(deltaTime);
 	m_pPhysicsScene->UpdateGizmos();
+
+	// fuck you jakobi
 
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))

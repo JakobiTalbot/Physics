@@ -98,6 +98,7 @@ void PhysicsScene::Update(float fDeltaTime)
 	{
 		Rigidbody* rb = (Rigidbody*)m_pSelectedObject;
 		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 0.1f);
+		aie::Gizmos::add2DLine(v2MousePos, rb->GetPosition(), glm::vec4(1,0,1,1));
 
 		if (aie::Input::getInstance()->wasMouseButtonReleased(aie::INPUT_MOUSE_BUTTON_LEFT))
 			m_pSelectedObject = nullptr;
@@ -196,6 +197,28 @@ bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2
 
 bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
+	Plane* pPlane = (Plane*)pObject1;
+	AABB* pAABB = (AABB*)pObject2;
+
+	glm::vec2 v2CollisionNormal = pPlane->GetNormal();
+	float fAABBToPlane = glm::dot(pAABB->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
+
+	// flip normal if AABB is behind plane
+	if (fAABBToPlane < 0)
+	{
+		v2CollisionNormal *= -1.f;
+		fAABBToPlane *= -1.f;
+	}
+
+	float fIntersection = glm::dot(pAABB->GetExtent() * v2CollisionNormal, v2CollisionNormal) - fAABBToPlane;
+	if (fIntersection > 0)
+	{
+		//objects collide
+		pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * fIntersection);
+		pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), v2CollisionNormal) * v2CollisionNormal));
+		return true;
+	}
+
 	return false;
 }
 
@@ -257,7 +280,7 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	AABB* pAABB2 = (AABB*)pObject2;
 
 	// normals of each face
-	static const glm::vec2 v2Faces[4] = 
+	static const glm::vec2 v2Faces[4] =
 	{
 		{-1, 0}, // left
 		{1, 0}, // right
@@ -277,7 +300,7 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	float fCollisionDepth = 0.0f;
 	glm::vec2 v2CollisionNormal = { 0, 0 };
 	int iCollisionFace = NULL;
-	
+
 	// find collision normal
 	for (int i = 0; i < 4; ++i)
 	{
@@ -305,9 +328,5 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	pAABB1->ApplyForce((-v2CollisionNormal * fImpulse * (pAABB1->GetMass() / fTotalMass)));
 	pAABB2->ApplyForce((v2CollisionNormal * fImpulse * (pAABB2->GetMass() / fTotalMass)));
 
-
-	//pAABB1->SetPosition(pAABB1->GetPosition() - v2CollisionNormal * fCollisionDepth);
-	//pAABB1->ApplyForce(-(1 + pAABB1->GetElasticity()) * glm::dot(pAABB1->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
-	//pAABB2->ApplyForce(-(1 + pAABB2->GetElasticity()) * glm::dot(pAABB2->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
 	return true;
 }
