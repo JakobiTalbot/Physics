@@ -13,5 +13,6 @@ AABB::~AABB()
 
 void AABB::MakeGizmo()
 {
-	aie::Gizmos::add2DAABBFilled(m_v2Position, m_v2Extent, m_v4Colour);
+	aie::Gizmos::add2DAABBFilled(m_v2Position, m_v2Extent, { 0, 0, 0, 1 });
+	aie::Gizmos::add2DAABBFilled(m_v2Position, m_v2Extent * 0.9f, m_v4Colour);
 }

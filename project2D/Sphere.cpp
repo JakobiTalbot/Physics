@@ -14,5 +14,6 @@ Sphere::~Sphere()
 
 void Sphere::MakeGizmo()
 {
-	aie::Gizmos::add2DCircle(m_v2Position, m_fRadius, 32, m_v4Colour);
+	aie::Gizmos::add2DCircle(m_v2Position, m_fRadius, 32, { 0, 0, 0, 1 });
+	aie::Gizmos::add2DCircle(m_v2Position, m_fRadius * 0.9f, 32, m_v4Colour);
 }

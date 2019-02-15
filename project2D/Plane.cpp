@@ -31,11 +31,10 @@ void Plane::MakeGizmo()
 	float fLineSegmentLength = 300.f;
 	glm::vec2 v2CentrePoint = m_v2Normal * m_fDistanceToOrigin;
 	glm::vec2 v2Parallel(m_v2Normal.y, -m_v2Normal.x);
-	glm::vec4 v4Colour(1, 1, 1, 1);
 
 	glm::vec2 v2Start = v2CentrePoint + (v2Parallel * fLineSegmentLength);
 	glm::vec2 v2End = v2CentrePoint - (v2Parallel * fLineSegmentLength);
-	aie::Gizmos::add2DLine(v2Start, v2End, v4Colour);
+	aie::Gizmos::add2DLine(v2Start, v2End, { 1, 1, 1, 1 });
 }
 
 void Plane::ResetPosition()

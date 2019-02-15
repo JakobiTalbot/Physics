@@ -116,7 +116,7 @@ void PhysicsScene::Update(float fDeltaTime)
 	else
 	{
 		Rigidbody* rb = (Rigidbody*)m_pSelectedObject;
-		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 0.1f);
+		rb->ApplyForce((v2MousePos - rb->GetPosition()) * 0.2f);
 		aie::Gizmos::add2DLine(v2MousePos, rb->GetPosition(), glm::vec4(1,0,1,1));
 
 		if (aie::Input::getInstance()->wasMouseButtonReleased(aie::INPUT_MOUSE_BUTTON_LEFT))
@@ -278,6 +278,34 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 
 bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 {
+	Sphere* pSphere = (Sphere*)pObject1;
+	AABB* pAABB = (AABB*)pObject2;
+
+	// find closest point to sphere
+	glm::vec2 v2ClosestPoint = glm::clamp(pSphere->GetPosition(), pAABB->GetPosition() - pAABB->GetExtent(), pAABB->GetPosition() + pAABB->GetExtent());
+
+	// check if closest point is within radius
+	if (glm::distance(v2ClosestPoint, pSphere->GetPosition()) < pSphere->GetRadius())
+	{
+		glm::vec2 v2CollisionNormal = pSphere->GetPosition() - v2ClosestPoint;
+		v2CollisionNormal = glm::normalize(v2CollisionNormal);
+
+		float fCollisionDepth = glm::distance(v2ClosestPoint, pSphere->GetPosition()) - pSphere->GetRadius();
+
+		// calculate impulse
+		float fImpulse = -(1.f + pAABB->GetElasticity()) * glm::dot((pAABB->GetVelocity() - pSphere->GetVelocity()), v2CollisionNormal);
+		fImpulse /= glm::dot(v2CollisionNormal, v2CollisionNormal * (1 / pAABB->GetMass() + 1 / pSphere->GetMass()));
+
+		float fTotalMass = pSphere->GetMass() + pAABB->GetMass();
+
+		pSphere->SetPosition(pSphere->GetPosition() + -v2CollisionNormal * (fCollisionDepth / 2.f));
+		pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * (fCollisionDepth / 2.f));
+
+		// apply forces to rigidbodies
+		pSphere->ApplyForce((-v2CollisionNormal * fImpulse * (pSphere->GetMass() / fTotalMass)));
+		pAABB->ApplyForce((v2CollisionNormal * fImpulse * (pAABB->GetMass() / fTotalMass)));
+		return true;
+	}
 	return false;
 }
 
@@ -334,8 +362,7 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		}
 	}
 
-	// perform collision
-			// calculate impulse
+	// calculate impulse
 	float fImpulse = -(1.f + pAABB2->GetElasticity()) * glm::dot((pAABB2->GetVelocity() - pAABB1->GetVelocity()), v2CollisionNormal);
 	fImpulse /= glm::dot(v2CollisionNormal, v2CollisionNormal * (1 / pAABB2->GetMass() + 1 / pAABB1->GetMass()));
 
