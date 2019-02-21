@@ -38,4 +38,5 @@ protected:
 	float m_fTimeStep;
 	std::vector<PhysicsObject*> m_pActors;
 	PhysicsObject* m_pSelectedObject;
+	float m_fDebugTimeStep;
 };
