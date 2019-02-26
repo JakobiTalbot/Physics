@@ -175,12 +175,15 @@ void PhysicsScene::UpdateGizmos()
 
 void PhysicsScene::CheckForCollision()
 {
+	// nested for loop
 	for (int i = 0; i < m_pActors.size() - 1; ++i)
 	{
 		for (int j = i + 1; j < m_pActors.size(); ++j)
 		{
+			// get pointers
 			PhysicsObject* pObject1 = m_pActors[i];
 			PhysicsObject* pObject2 = m_pActors[j];
+			// get shape IDs
 			int nShapeID1 = pObject1->GetShapeID();
 			int nShapeID2 = pObject2->GetShapeID();
 
@@ -188,6 +191,7 @@ void PhysicsScene::CheckForCollision()
 			int functionIdx = (nShapeID1 * SHAPETYPECOUNT) + nShapeID2;
 			fn collisionFunctionPtr = CollisionFunctionArray[functionIdx];
 
+			// if the function pointer exists
 			if (collisionFunctionPtr)
 			{
 				// check for collision
@@ -315,7 +319,7 @@ bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		}
 
 		float fCollisionDepth = glm::distance(v2ClosestPoint, pSphere->GetPosition()) - pSphere->GetRadius();
-		fCollisionDepth -= 0.001f;
+		fCollisionDepth -= 0.01f;
 
 		// calculate impulse
 		float fImpulse = -(1.f + CalculateElasticity(pAABB, pSphere, ElasticityMode::avg)) * glm::dot((pAABB->GetVelocity() - pSphere->GetVelocity()), v2CollisionNormal);

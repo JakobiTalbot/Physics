@@ -36,7 +36,7 @@ bool Application2D::startup() {
 	m_pPhysicsScene->AddActor(box);
 	for (int i = 0; i < 5; ++i)
 	{		
-		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, (rand() % 100) - 50), glm::vec2((rand() % 60) - 30, (rand() % 60) - 30), 1.f, 2.f, 1.f, glm::vec4((rand() % 1000)/1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, (rand() % 100) - 50), glm::vec2((rand() % 60) - 30, (rand() % 60) - 30), 1.f, 5.f, 1.f, glm::vec4((rand() % 1000)/1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
 		m_pPhysicsScene->AddActor(ball);
 	}
 
