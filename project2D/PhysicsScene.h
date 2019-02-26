@@ -3,6 +3,16 @@
 #include <glm\ext.hpp>
 #include <vector>
 #include "PhysicsObject.h"
+
+class Rigidbody;
+
+enum class ElasticityMode
+{
+	min,
+	max,
+	avg
+};
+
 class PhysicsScene
 {
 public:
@@ -32,6 +42,8 @@ public:
 	static bool AABB2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2);
 	static bool AABB2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2);
 	static bool AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2);
+
+	static float CalculateElasticity(Rigidbody* pRigidbody1, Rigidbody* pRigidbody2, ElasticityMode elasticityMode);
 
 protected:
 	glm::vec2 m_v2Gravity;

@@ -127,17 +127,17 @@ void PhysicsScene::Update(float fDeltaTime)
 			m_pSelectedObject = nullptr;
 	}
 
-	//while (fDebugAccumalatedTime >= m_fDebugTimeStep)
-	//{
-	//	fDebugAccumalatedTime -= m_fDebugTimeStep;
+	while (fDebugAccumalatedTime >= m_fDebugTimeStep)
+	{
+		fDebugAccumalatedTime -= m_fDebugTimeStep;
 
-	//	system("cls");
-	//	for (int i = 0; i < m_pActors.size(); ++i)
-	//	{
-	//		Rigidbody* pRB = (Rigidbody*)m_pActors[i];
-	//		std::cout << "SHAPE " << i << ": " << m_pActors[i]->GetShapeID() << " | v = " << pRB->GetVelocity().x << ", " << pRB->GetVelocity().y << " | pos = " << pRB->GetPosition().x << ", " << pRB->GetPosition().y << std::endl;
-	//	}
-	//}
+		system("cls");
+		for (int i = 0; i < m_pActors.size(); ++i)
+		{
+			Rigidbody* pRB = (Rigidbody*)m_pActors[i];
+			std::cout << "SHAPE " << i << ": " << m_pActors[i]->GetShapeID() << " | v = " << pRB->GetVelocity().x << ", " << pRB->GetVelocity().y << " | pos = " << pRB->GetPosition().x << ", " << pRB->GetPosition().y << std::endl;
+		}
+	}
 
 	// fixed update
 	while (fAccumulatedTime >= m_fTimeStep)
@@ -278,7 +278,7 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 		glm::vec2 v2Dir = pSphere1->GetPosition() - pSphere2->GetPosition();
 
 		// calculate impulse
-		float fImpulse = -(1.f + pSphere1->GetElasticity() + pSphere2->GetElasticity()) * glm::dot((pSphere2->GetVelocity() - pSphere1->GetVelocity()), glm::normalize(v2Dir));
+		float fImpulse = -(1.f + CalculateElasticity(pSphere1, pSphere2, ElasticityMode::avg)) * glm::dot((pSphere2->GetVelocity() - pSphere1->GetVelocity()), glm::normalize(v2Dir));
 		fImpulse /= glm::dot(glm::normalize(v2Dir), glm::normalize(v2Dir) * (1 / pSphere2->GetMass() + 1 / pSphere1->GetMass()));
 
 		float fTotalMass = pSphere1->GetMass() + pSphere2->GetMass();
@@ -286,8 +286,8 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 		pSphere2->SetPosition(pSphere2->GetPosition() + glm::normalize(v2Dir) * (fPenetration / 2.f));
 
 		// apply forces to rigidbodies
-		pSphere1->ApplyForce((-glm::normalize(v2Dir) * fImpulse * (pSphere1->GetMass() / fTotalMass)));
-		pSphere2->ApplyForce((glm::normalize(v2Dir) * fImpulse * (pSphere2->GetMass() / fTotalMass)));
+		pSphere1->ApplyForce((-glm::normalize(v2Dir) * fImpulse * (pSphere1->GetMass() / fTotalMass)) * 2.f);
+		pSphere2->ApplyForce((glm::normalize(v2Dir) * fImpulse * (pSphere2->GetMass() / fTotalMass)) * 2.f);
 		return true;
 	}
 	return false;
@@ -315,21 +315,21 @@ bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		}
 
 		float fCollisionDepth = glm::distance(v2ClosestPoint, pSphere->GetPosition()) - pSphere->GetRadius();
-		fCollisionDepth += 0.01f;
+		fCollisionDepth -= 0.001f;
 
 		// calculate impulse
-		float fImpulse = -(1.f + pSphere->GetElasticity() + pAABB->GetElasticity()) * glm::dot((pAABB->GetVelocity() - pSphere->GetVelocity()), v2CollisionNormal);
+		float fImpulse = -(1.f + CalculateElasticity(pAABB, pSphere, ElasticityMode::avg)) * glm::dot((pAABB->GetVelocity() - pSphere->GetVelocity()), v2CollisionNormal);
 		fImpulse /= glm::dot(v2CollisionNormal, v2CollisionNormal * (1 / pAABB->GetMass() + 1 / pSphere->GetMass()));
 
 		float fTotalMass = pSphere->GetMass() + pAABB->GetMass();
 
 		// restitution
-		pSphere->SetPosition(pSphere->GetPosition() + -v2CollisionNormal * (fCollisionDepth / 2.f));
+		pSphere->SetPosition(pSphere->GetPosition() - v2CollisionNormal * (fCollisionDepth / 2.f));
 		pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * (fCollisionDepth / 2.f));
 
 		// apply forces to rigidbodies
-		pSphere->ApplyForce((-v2CollisionNormal * fImpulse * (pSphere->GetMass() / fTotalMass)));
-		pAABB->ApplyForce((v2CollisionNormal * fImpulse * (pAABB->GetMass() / fTotalMass)));
+		pSphere->ApplyForce((-v2CollisionNormal * fImpulse * (pSphere->GetMass() / fTotalMass)) * 2.f);
+		pAABB->ApplyForce((v2CollisionNormal * fImpulse * (pAABB->GetMass() / fTotalMass)) * 2.f);
 		return true;
 	}
 	return false;
@@ -370,6 +370,7 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		(pAABB1->GetPosition().y + pAABB1->GetExtent().y - (pAABB2->GetPosition().y - pAABB2->GetExtent().y)) // top
 	};
 
+	// declare variables
 	float fCollisionDepth = 0.0f;
 	glm::vec2 v2CollisionNormal = { 0, 0 };
 	int iCollisionFace = NULL;
@@ -389,7 +390,7 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	}
 
 	// calculate impulse
-	float fImpulse = -(1.f + pAABB1->GetElasticity() + pAABB2->GetElasticity()) * glm::dot((pAABB2->GetVelocity() - pAABB1->GetVelocity()), v2CollisionNormal);
+	float fImpulse = -(1.f + CalculateElasticity(pAABB1, pAABB2, ElasticityMode::avg)) * glm::dot((pAABB2->GetVelocity() - pAABB1->GetVelocity()), v2CollisionNormal);
 	fImpulse /= glm::dot(v2CollisionNormal, v2CollisionNormal * (1 / pAABB2->GetMass() + 1 / pAABB1->GetMass()));
 
 	float fTotalMass = pAABB1->GetMass() + pAABB2->GetMass();
@@ -397,12 +398,25 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	fCollisionDepth += 0.001f;
 
 	// restitution
-	pAABB1->SetPosition(pAABB1->GetPosition() + -v2CollisionNormal * (fCollisionDepth / 2.f));
+	pAABB1->SetPosition(pAABB1->GetPosition() - v2CollisionNormal * (fCollisionDepth / 2.f));
 	pAABB2->SetPosition(pAABB2->GetPosition() + v2CollisionNormal * (fCollisionDepth / 2.f));
 
 	// apply forces to rigidbodies
-	pAABB1->ApplyForce((-v2CollisionNormal * fImpulse * (pAABB1->GetMass() / fTotalMass)));
-	pAABB2->ApplyForce((v2CollisionNormal * fImpulse * (pAABB2->GetMass() / fTotalMass)));
+	pAABB1->ApplyForce((-v2CollisionNormal * fImpulse * (pAABB1->GetMass() / fTotalMass)) * 2.f);
+	pAABB2->ApplyForce((v2CollisionNormal * fImpulse * (pAABB2->GetMass() / fTotalMass)) * 2.f);
 
 	return true;
+}
+
+float PhysicsScene::CalculateElasticity(Rigidbody* pRigidbody1, Rigidbody* pRigidbody2, ElasticityMode elasticityMode)
+{
+	switch (elasticityMode)
+	{
+		case (ElasticityMode::min): // returns minimum elasticity
+			return fminf(pRigidbody1->GetElasticity(), pRigidbody2->GetElasticity());
+		case (ElasticityMode::max): // returns maximum elasticity
+			return fmaxf(pRigidbody1->GetElasticity(), pRigidbody2->GetElasticity());
+		case (ElasticityMode::avg): // returns average elasticity
+			return (pRigidbody1->GetElasticity() + pRigidbody2->GetElasticity()) / 2.f;
+	}
 }

@@ -29,16 +29,18 @@ bool Application2D::startup() {
 	m_pPhysicsScene->SetGravity(glm::vec2(0, -150));
 	m_pPhysicsScene->SetTimeStep(1.f/60.f);
 	srand(time(NULL));
-	for (int i = 0; i < 31; ++i)
+
+	AABB* box1 = new AABB({ -40, 0 }, { 0, 0 }, 0.f, 1.f, { 7.f, 7.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	m_pPhysicsScene->AddActor(box1);
+	AABB* box = new AABB({ 40, 0 }, { 0, 0 }, 0.f, 1.f, { 7.f, 7.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
+	m_pPhysicsScene->AddActor(box);
+	for (int i = 0; i < 5; ++i)
 	{		
 		Sphere* ball = new Sphere(glm::vec2((rand() % 200) - 100, (rand() % 100) - 50), glm::vec2((rand() % 60) - 30, (rand() % 60) - 30), 1.f, 2.f, 1.f, glm::vec4((rand() % 1000)/1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
 		m_pPhysicsScene->AddActor(ball);
 	}
 
-	//AABB* box = new AABB({ 0, -20 }, { 0, 0 }, 0.f, 1.f, { 7.f, 7.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
-	//m_pPhysicsScene->AddActor(box);
-	//AABB* box1 = new AABB({ 0, 20 }, { 0, 0 }, 0.f, 1.f, { 7.f, 7.f }, 1.f, glm::vec4((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, 1));
-	//m_pPhysicsScene->AddActor(box1);
+
 	setBackgroundColour(0.3f, 0.3f, 0.3f, 1.f);
 	Plane* topPlane = new Plane(glm::vec2(0.f, -1.f), -55.f);
 	m_pPhysicsScene->AddActor(topPlane);
