@@ -7,7 +7,6 @@ public class ClickMove : MonoBehaviour
     public float m_fMoveSpeed = 100f;
     public float m_fScrollMoveSpeed = 0.3f;
 
-    private GameObject m_camera;
     private GameObject m_selectedObject;
     private Vector3 m_v3Destination;
     private float m_fDistance;
@@ -15,14 +14,12 @@ public class ClickMove : MonoBehaviour
 	// Use this for initialization
 	void Start()
     {
-        // find camera
-        m_camera = GameObject.FindGameObjectWithTag("MainCamera");
 	}
 	
 	// Update is called once per frame
 	void Update()
     {
-        if (!m_selectedObject && Input.GetMouseButtonDown(0))
+        if (!m_selectedObject && Input.GetMouseButtonDown(1))
         {
             // create raycast variables
             RaycastHit raycastHit = new RaycastHit();
@@ -32,6 +29,10 @@ public class ClickMove : MonoBehaviour
             if (Physics.Raycast(ray, out raycastHit)
                 && !raycastHit.transform.gameObject.CompareTag("Plane"))
             {
+                if (raycastHit.transform.gameObject.CompareTag("Player"))
+                {
+                    raycastHit.transform.gameObject.GetComponentInParent<Ragdoll>().m_bRagdollOn = true;
+                }
                 // make selected object the hit object
                 m_selectedObject = raycastHit.transform.gameObject;
                 m_fDistance = raycastHit.distance;
@@ -54,10 +55,10 @@ public class ClickMove : MonoBehaviour
             // get direction to seek destination
             Vector3 m_v3Direction = m_v3Destination - m_selectedObject.transform.position;
             // add force to rigidbody in direction of destination
-            m_selectedObject.GetComponent<Rigidbody>().AddForce(m_v3Direction * m_fMoveSpeed);
+            m_selectedObject.GetComponent<Rigidbody>().AddForce(m_v3Direction * m_fMoveSpeed * m_selectedObject.GetComponent<Rigidbody>().mass);
 
             // set selectedObject to null if mouse button is released
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(1))
             {
                 m_selectedObject.GetComponent<Rigidbody>().drag = m_fOriginalDrag;
                 m_selectedObject = null;

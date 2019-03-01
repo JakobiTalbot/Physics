@@ -243,30 +243,28 @@ bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	Plane* pPlane = (Plane*)pObject1;
 	AABB* pAABB = (AABB*)pObject2;
 
-	glm::vec2 v2CollisionNormal = pPlane->GetNormal();
-	float fAABBToPlane = glm::dot(pAABB->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
+	//glm::vec2 v2CollisionNormal = pPlane->GetNormal();
+	//float fAABBToPlane = glm::dot(pAABB->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
 
-	// flip normal if AABB is behind plane
-	if (fAABBToPlane < 0)
-	{
-		v2CollisionNormal *= -1.f;
-		fAABBToPlane *= -1.f;
-	}
+	//// flip normal if AABB is behind plane
+	//if (fAABBToPlane < 0)
+	//{
+	//	v2CollisionNormal *= -1.f;
+	//	fAABBToPlane *= -1.f;
+	//}
 
-	// get collision depth
-	float fCollisionDepth = glm::dot(pAABB->GetExtent() * v2CollisionNormal, v2CollisionNormal) - fAABBToPlane;
+	//// get collision depth
+	//float fCollisionDepth = glm::dot(pAABB->GetExtent() * v2CollisionNormal, v2CollisionNormal) - fAABBToPlane;
 
-	// check collision
-	if (fCollisionDepth > 0)
-	{
-		// restitution
-		pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * fCollisionDepth);
-		// resolution
-		pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), v2CollisionNormal) * v2CollisionNormal));
-		return true;
-	}
-
-	return false;
+	//// check collision
+	//if (fCollisionDepth > 0)
+	//{
+	//	// restitution
+	//	pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * fCollisionDepth);
+	//	// resolution
+	//	pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), v2CollisionNormal) * v2CollisionNormal));
+	//	return true;
+	//}
 }
 
 bool PhysicsScene::Sphere2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
