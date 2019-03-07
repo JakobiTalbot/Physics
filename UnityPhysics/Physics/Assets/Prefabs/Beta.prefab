@@ -572,7 +572,7 @@ GameObject:
   - component: {fileID: 114649878338550758}
   m_Layer: 0
   m_Name: Beta
-  m_TagString: Player
+  m_TagString: Ragdoll
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2356,6 +2356,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114047578915699988
 MonoBehaviour:
@@ -2368,6 +2370,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114506139281909134
 MonoBehaviour:
@@ -2380,6 +2384,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114518200964796908
 MonoBehaviour:
@@ -2392,6 +2398,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114571384802238226
 MonoBehaviour:
@@ -2404,6 +2412,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114649878338550758
 MonoBehaviour:
@@ -2428,6 +2438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114725721652483468
 MonoBehaviour:
@@ -2440,6 +2452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114870840913725944
 MonoBehaviour:
@@ -2452,6 +2466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114968449885527222
 MonoBehaviour:
@@ -2464,6 +2480,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114983209268368778
 MonoBehaviour:
@@ -2476,6 +2494,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!114 &114993746213458678
 MonoBehaviour:
@@ -2488,6 +2508,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bd9ec405fd27f42aee771c75fadf93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_dismemberParticle: {fileID: 1228409792943804, guid: b68af1a13b14e7a49bba27e945dc7be1,
+    type: 2}
   m_fCollisionForceToRagdoll: 1000
 --- !u!135 &135235026012042382
 SphereCollider:
@@ -2499,8 +2521,8 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.09231648
-  m_Center: {x: 0, y: 0.09231648, z: 0}
+  m_Radius: 0.12633422
+  m_Center: {x: 1.3138569e-15, y: 0.09231648, z: 0.034017745}
 --- !u!136 &136126218152117828
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2906,7 +2928,7 @@ CharacterJoint:
   m_EnableProjection: 1
   m_ProjectionDistance: 0.1
   m_ProjectionAngle: 180
-  m_BreakForce: Infinity
+  m_BreakForce: 4000
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 0
@@ -3302,7 +3324,7 @@ CharacterJoint:
   m_EnableProjection: 1
   m_ProjectionDistance: 0.1
   m_ProjectionAngle: 180
-  m_BreakForce: Infinity
+  m_BreakForce: 4000
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 0

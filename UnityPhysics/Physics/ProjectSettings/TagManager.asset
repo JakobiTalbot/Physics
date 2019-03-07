@@ -7,6 +7,8 @@ TagManager:
   - Plane
   - Bullet
   - UI
+  - TrapTrigger
+  - Ragdoll
   layers:
   - Default
   - TransparentFX

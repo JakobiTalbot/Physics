@@ -10,9 +10,13 @@ public class PlayerController : MonoBehaviour
     public float m_fJumpForce = 300f;
     public int m_nBulletFirePower = 20;
     public float m_fBulletPowerIncreaseSpeed = 10f;
+    public float m_fCameraZoomFOV = 20f;
+    public float m_fCrouchHeight = 0.4f;
 
     private GameObject m_camera;
     private Rigidbody m_rb;
+    private float m_fCameraFOV;
+    private float m_fStartSensitivity;
     private bool m_bCanJump = true;
 	// Use this for initialization
 	void Start()
@@ -24,6 +28,9 @@ public class PlayerController : MonoBehaviour
         // get reference to rigidbody because it is much shorter
         m_rb = GetComponent<Rigidbody>();
         GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().UpdateBulletPower(m_nBulletFirePower);
+        // get camera FOV
+        m_fCameraFOV = m_camera.GetComponent<Camera>().fieldOfView;
+        m_fStartSensitivity = m_fMouseSensitivity;
     }
 
     // Update is called once per frame
@@ -59,26 +66,56 @@ public class PlayerController : MonoBehaviour
             m_bCanJump = false;
         }
 
-        // adjust bullet power with scroll wheel
-        if (Input.mouseScrollDelta.y > 0)
+        // zoom
+        if (Input.GetMouseButton(1))
         {
-            // increase more if holding shift
-            if (Input.GetKey(KeyCode.LeftShift))
-                m_nBulletFirePower += 10;
-            else
-                m_nBulletFirePower += 1;
-
-            GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().UpdateBulletPower(m_nBulletFirePower);
+            m_camera.GetComponent<Camera>().fieldOfView = Mathf.Lerp(m_camera.GetComponent<Camera>().fieldOfView, m_fCameraZoomFOV, 0.5f);
+            if (Input.GetMouseButtonDown(1))
+                m_fMouseSensitivity = (m_fCameraFOV / m_fCameraZoomFOV) * 6f;
+            GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().SetZoom(true);
         }
-        else if (Input.mouseScrollDelta.y < 0)
+        else
         {
-            // increase more if holding shift
-            if (Input.GetKey(KeyCode.LeftShift))
-                m_nBulletFirePower -= 10;
-            else
-                m_nBulletFirePower -= 1;
+            m_camera.GetComponent<Camera>().fieldOfView = Mathf.Lerp(m_camera.GetComponent<Camera>().fieldOfView, m_fCameraFOV, 0.5f);
+            m_fMouseSensitivity = m_fStartSensitivity;
+            GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().SetZoom(false);
+        }
 
-            GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().UpdateBulletPower(m_nBulletFirePower);
+        // crouch (dodgy)
+        Vector3 v3Scale = transform.localScale;
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            v3Scale.y = Mathf.Lerp(v3Scale.y, m_fCrouchHeight, 0.4f);
+        }
+        else
+        {
+            v3Scale.y = Mathf.Lerp(v3Scale.y, 1f, 0.4f);
+        }
+        transform.localScale = v3Scale;
+
+        // adjust bullet power with scroll wheel
+        if (!m_camera.GetComponent<ClickMove>().m_selectedObject)
+        {
+            if (Input.mouseScrollDelta.y > 0)
+            {
+                // increase more if holding shift
+                if (Input.GetKey(KeyCode.LeftShift))
+                    m_nBulletFirePower += 10;
+                else
+                    m_nBulletFirePower += 1;
+
+                GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().UpdateBulletPower(m_nBulletFirePower);
+            }
+            else if (Input.mouseScrollDelta.y < 0)
+            {
+                // decrease more if holding shift
+                if (Input.GetKey(KeyCode.LeftShift))
+                    m_nBulletFirePower -= 10;
+                else
+                    m_nBulletFirePower -= 1;
+
+                GameObject.FindGameObjectWithTag("UI").GetComponent<UI>().UpdateBulletPower(m_nBulletFirePower);
+            }
         }
 
         // shoot bullet

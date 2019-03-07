@@ -36,4 +36,12 @@ public class Limbs : MonoBehaviour
     {
         Instantiate(m_dismemberParticle, transform.position, transform.rotation);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("TrapTrigger"))
+        {
+            other.GetComponent<Trap>().ActivateTrap();
+        }
+    }
 }

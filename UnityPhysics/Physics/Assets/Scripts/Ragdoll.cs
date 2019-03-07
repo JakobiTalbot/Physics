@@ -33,7 +33,10 @@ public class Ragdoll : MonoBehaviour
     {
         if (m_bRagdollOn)
             return;
-        Vector3 v3SeekPos = new Vector3(GameObject.FindGameObjectWithTag("Player").transform.position.x, transform.position.y, GameObject.FindGameObjectWithTag("Player").transform.position.z);
-        transform.LookAt(v3SeekPos);
+        //Vector3 v3SeekPos = new Vector3(GameObject.FindGameObjectWithTag("Player").transform.position.x, transform.position.y, GameObject.FindGameObjectWithTag("Player").transform.position.z);
+        ////transform.LookAt(v3SeekPos);
+        //Vector3 v3 = GameObject.FindGameObjectWithTag("Player").transform.position - transform.position;
+        //v3.y = 0f;
+        //transform.rotation = Quaternion.LookRotation(v3);
 	}
 }

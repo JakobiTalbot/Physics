@@ -7,10 +7,12 @@ public class ClickMove : MonoBehaviour
     public float m_fMoveSpeed = 100f;
     public float m_fScrollMoveSpeed = 0.3f;
 
-    private GameObject m_selectedObject;
+    [HideInInspector]
+    public GameObject m_selectedObject;
     private Vector3 m_v3Destination;
     private float m_fDistance;
     private float m_fOriginalDrag;
+    private bool m_bCheckKeyDown = false;
 	// Use this for initialization
 	void Start()
     {
@@ -19,15 +21,16 @@ public class ClickMove : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-        if (!m_selectedObject && Input.GetMouseButtonDown(1))
+        if (!m_selectedObject && Input.GetKeyDown(KeyCode.E))
         {
             // create raycast variables
             RaycastHit raycastHit = new RaycastHit();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             
-            // if raycast hit a gameobject that isnt a plane
+            // if raycast hit a gameobject that isnt a plane and has a rigidbody
             if (Physics.Raycast(ray, out raycastHit)
-                && !raycastHit.transform.gameObject.CompareTag("Plane"))
+                && !raycastHit.transform.gameObject.CompareTag("Plane")
+                && raycastHit.transform.GetComponent<Rigidbody>())
             {
                 if (raycastHit.transform.gameObject.CompareTag("Player"))
                 {
@@ -58,10 +61,16 @@ public class ClickMove : MonoBehaviour
             m_selectedObject.GetComponent<Rigidbody>().AddForce(m_v3Direction * m_fMoveSpeed * m_selectedObject.GetComponent<Rigidbody>().mass);
 
             // set selectedObject to null if mouse button is released
-            if (Input.GetMouseButtonUp(1))
+            if (Input.GetKeyDown(KeyCode.E) && m_bCheckKeyDown)
             {
                 m_selectedObject.GetComponent<Rigidbody>().drag = m_fOriginalDrag;
                 m_selectedObject = null;
+                m_bCheckKeyDown = false;
+            }
+
+            if (Input.GetKeyUp(KeyCode.E) && !m_bCheckKeyDown)
+            {
+                m_bCheckKeyDown = true;
             }
         }
 	}
