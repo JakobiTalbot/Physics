@@ -51,6 +51,9 @@ bool Application2D::startup() {
 	Plane* rightPlane = new Plane(glm::vec2(-1.f, 0.f), -99.f);
 	m_pPhysicsScene->AddActor(rightPlane);
 
+	Plane* diagonalPlane = new Plane(glm::vec2(-0.707f, 0.707f), 0);
+	m_pPhysicsScene->AddActor(diagonalPlane);
+
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	
 	m_cameraX = 0;
