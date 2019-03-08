@@ -213,9 +213,7 @@ bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2
 	Plane* pPlane = (Plane*)pObject1;
 	Sphere* pSphere = (Sphere*)pObject2;
 
-	// get collision normal
 	glm::vec2 v2CollisionNormal = pPlane->GetNormal();
-	// find distance between sphere and plane
 	float fSphereToPlane = glm::dot(pSphere->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
 
 	// flip normal if sphere is behind plane
@@ -225,13 +223,11 @@ bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2
 		fSphereToPlane *= -1.f;
 	}
 
-	float fCollisionDepth = pSphere->GetRadius() - fSphereToPlane;
-	// check if objects collide
-	if (fCollisionDepth > 0)
+	float fIntersection = pSphere->GetRadius() - fSphereToPlane;
+	if (fIntersection > 0)
 	{
-		// restitution
-		pSphere->SetPosition(pSphere->GetPosition() + v2CollisionNormal * fCollisionDepth);
-		// resolution
+		// objects collide
+		pSphere->SetPosition(pSphere->GetPosition() + v2CollisionNormal * fIntersection);
 		pSphere->ApplyForce(-(1 + pSphere->GetElasticity()) * glm::dot(pSphere->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
 		return true;
 	}
@@ -243,28 +239,27 @@ bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	Plane* pPlane = (Plane*)pObject1;
 	AABB* pAABB = (AABB*)pObject2;
 
-	//glm::vec2 v2CollisionNormal = pPlane->GetNormal();
-	//float fAABBToPlane = glm::dot(pAABB->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
+	glm::vec2 v2CollisionNormal = pPlane->GetNormal();
+	float fAABBToPlane = glm::dot(pAABB->GetPosition(), pPlane->GetNormal()) - pPlane->GetDistance();
 
-	//// flip normal if AABB is behind plane
-	//if (fAABBToPlane < 0)
-	//{
-	//	v2CollisionNormal *= -1.f;
-	//	fAABBToPlane *= -1.f;
-	//}
+	// flip normal if AABB is behind plane
+	if (fAABBToPlane < 0)
+	{
+		v2CollisionNormal *= -1.f;
+		fAABBToPlane *= -1.f;
+	}
 
-	//// get collision depth
-	//float fCollisionDepth = glm::dot(pAABB->GetExtent() * v2CollisionNormal, v2CollisionNormal) - fAABBToPlane;
+	float fIntersection = glm::dot(pAABB->GetExtent() * v2CollisionNormal, v2CollisionNormal) - fAABBToPlane;
+	if (fIntersection > 0)
+	{
+		//objects collide
+		pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * fIntersection);
+		pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), v2CollisionNormal) * v2CollisionNormal));
 
-	//// check collision
-	//if (fCollisionDepth > 0)
-	//{
-	//	// restitution
-	//	pAABB->SetPosition(pAABB->GetPosition() + v2CollisionNormal * fCollisionDepth);
-	//	// resolution
-	//	pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), v2CollisionNormal) * v2CollisionNormal));
-	//	return true;
-	//}
+		return true;
+	}
+
+	return false;
 }
 
 bool PhysicsScene::Sphere2Plane(PhysicsObject* pObject1, PhysicsObject* pObject2)
@@ -281,7 +276,7 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 	if (glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) < (pSphere1->GetRadius() + pSphere2->GetRadius()))
 	{
 		// restitution
-		float fCollisionDepth = glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) - (pSphere1->GetRadius() + pSphere2->GetRadius());
+		float fPenetration = glm::distance(pSphere1->GetPosition(), pSphere2->GetPosition()) - (pSphere1->GetRadius() + pSphere2->GetRadius());
 
 		// get direction between rigidbodies
 		glm::vec2 v2Dir = pSphere1->GetPosition() - pSphere2->GetPosition();
@@ -291,8 +286,8 @@ bool PhysicsScene::Sphere2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject
 		fImpulse /= glm::dot(glm::normalize(v2Dir), glm::normalize(v2Dir) * (1 / pSphere2->GetMass() + 1 / pSphere1->GetMass()));
 
 		float fTotalMass = pSphere1->GetMass() + pSphere2->GetMass();
-		pSphere1->SetPosition(pSphere1->GetPosition() + -glm::normalize(v2Dir) * (fCollisionDepth / 2.f));
-		pSphere2->SetPosition(pSphere2->GetPosition() + glm::normalize(v2Dir) * (fCollisionDepth / 2.f));
+		pSphere1->SetPosition(pSphere1->GetPosition() + -glm::normalize(v2Dir) * (fPenetration / 2.f));
+		pSphere2->SetPosition(pSphere2->GetPosition() + glm::normalize(v2Dir) * (fPenetration / 2.f));
 
 		// apply forces to rigidbodies
 		pSphere1->ApplyForce((-glm::normalize(v2Dir) * fImpulse * (pSphere1->GetMass() / fTotalMass)) * 2.f);
@@ -324,8 +319,6 @@ bool PhysicsScene::Sphere2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 		}
 
 		float fCollisionDepth = glm::distance(v2ClosestPoint, pSphere->GetPosition()) - pSphere->GetRadius();
-
-		// prevent objects getting stuck in each other
 		fCollisionDepth -= 0.01f;
 
 		// calculate impulse
@@ -406,7 +399,6 @@ bool PhysicsScene::AABB2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 
 	float fTotalMass = pAABB1->GetMass() + pAABB2->GetMass();
 	
-	// prevent objects getting stuck in each other
 	fCollisionDepth += 0.001f;
 
 	// restitution

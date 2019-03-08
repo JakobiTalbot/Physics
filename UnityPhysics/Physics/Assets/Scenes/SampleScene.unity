@@ -218,6 +218,56 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 144906656520799216, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144622016520965142, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144562014087806740, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144471748993043940, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144834328108348036, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144253836840852118, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144026013967447924, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144188550825511442, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144900519476043150, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144820237208791600, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aa2913fb4ffd2114eaa21215ed400ee0, type: 2}
   m_IsPrefabAsset: 0
@@ -558,6 +608,56 @@ Prefab:
         type: 2}
       propertyPath: m_ConnectedAnchor.z
       value: -0.055867042
+      objectReference: {fileID: 0}
+    - target: {fileID: 144188550825511442, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144622016520965142, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144900519476043150, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144820237208791600, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144906656520799216, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144562014087806740, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144471748993043940, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144834328108348036, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144253836840852118, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 144026013967447924, guid: aa2913fb4ffd2114eaa21215ed400ee0,
+        type: 2}
+      propertyPath: m_EnableProjection
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aa2913fb4ffd2114eaa21215ed400ee0, type: 2}
