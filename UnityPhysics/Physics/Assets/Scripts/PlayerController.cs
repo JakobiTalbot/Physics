@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             GameObject bullet = Instantiate(m_bullet, m_camera.transform.position + m_camera.transform.forward, m_camera.transform.rotation);
-            bullet.GetComponent<Rigidbody>().velocity += (bullet.transform.position - m_camera.transform.position).normalized * m_nBulletFirePower;
+            bullet.GetComponent<Rigidbody>().velocity += ((bullet.transform.position - m_camera.transform.position).normalized * m_nBulletFirePower) + GetComponent<Rigidbody>().velocity;
         }
 
         // rotate camera

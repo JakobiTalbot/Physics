@@ -56,7 +56,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1347713599261436}
   m_LocalRotation: {x: -0, y: 0.0000007003545, z: -0, w: 1}
-  m_LocalPosition: {x: -4.84, y: 1.28, z: -11.65}
+  m_LocalPosition: {x: -0.192, y: 1.28, z: -13.132}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4643867632406624}
@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ddd8b6176b47f1478cb65efd99a7a96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_bullet: {fileID: 1685541014174250, guid: fffb9763d681ba446818e2a0f6842f20, type: 2}
+  m_bullet: {fileID: 1975457108487340, guid: ec3e8f3ed27e2244caaedaf589590a03, type: 2}
   m_fMoveSpeed: 20
   m_fMouseSensitivity: 100
   m_fJumpForce: 300
@@ -219,7 +219,7 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1347713599261436}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: f0812a2a5e07435489fcedef964f5648, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
