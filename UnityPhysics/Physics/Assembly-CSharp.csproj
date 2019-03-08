@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Trap.cs" />
     <Compile Include="Assets\Scripts\TrapBlock.cs" />
     <Compile Include="Assets\Scripts\UI.cs" />
+    <None Include="Assets\Shaders\Skybox Cubemap Extended.shader" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/s181714/Desktop/Physics/UnityPhysics/Physics/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
