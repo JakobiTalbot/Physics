@@ -226,8 +226,10 @@ bool PhysicsScene::Plane2Sphere(PhysicsObject* pObject1, PhysicsObject* pObject2
 	float fIntersection = pSphere->GetRadius() - fSphereToPlane;
 	if (fIntersection > 0)
 	{
-		// objects collide
+		// restitution
+		fIntersection += 0.01f;
 		pSphere->SetPosition(pSphere->GetPosition() + v2CollisionNormal * fIntersection);
+		// resolution
 		pSphere->ApplyForce(-(1 + pSphere->GetElasticity()) * glm::dot(pSphere->GetVelocity(), v2CollisionNormal) * v2CollisionNormal);
 		return true;
 	}
@@ -247,6 +249,7 @@ bool PhysicsScene::Plane2AABB(PhysicsObject* pObject1, PhysicsObject* pObject2)
 	if (fabs(fDistance) <= r)
 	{
 		// restitution
+		r += 0.01f;
 		pAABB->SetPosition(pAABB->GetPosition() + pPlane->GetNormal() * (r - fDistance));
 		// resolution
 		pAABB->ApplyForce((-(1 + pAABB->GetElasticity()) * glm::dot(pAABB->GetVelocity(), pPlane->GetNormal()) * pPlane->GetNormal()));
